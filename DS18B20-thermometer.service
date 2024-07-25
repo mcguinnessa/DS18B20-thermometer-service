@@ -1,0 +1,12 @@
+[Unit]
+Description=Provides and endpoint to get the current temperature from the DS18B20 probe
+After=network.target
+
+[Service]
+User=alex
+WorkingDirectory=/home/alex/scripts/DS18B20_temp_sensor/
+ExecStart=/home/alex/scripts/DS18B20_temp_sensor/.venv/bin/gunicorn -b 0.0.0.0:5000 -w 1 DS18B20_service:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
