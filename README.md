@@ -12,6 +12,14 @@ python -m venv .venv
 . .venv/bin/activate
 pip install -r requirements.txt 
 
+#Create Service
+create link to service file in /etc/systemd/system/DS18B20-thermometer.service
+
+sudo systemctl daemon-reload
+sudo systemctl start DS18B20-thermometer
+sudo systemctl enable DS18B20-thermometer
+sudo systemctl status DS18B20-thermometer
+
 Currently listens on port 5000, can be changed in the service file
 
 Supported Endpoints
