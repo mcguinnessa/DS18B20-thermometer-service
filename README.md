@@ -7,6 +7,11 @@ RPi is not GPIO4, then change the second parameter accordingly
 vi /boot/config.txt
 dtoverlay=w1-gpio,gpiopin=4
 
+#Install
+python -m venv .venv
+. .venv/bin/activate
+pip install -r requirements.txt 
+
 Currently listens on port 5000, can be changed in the service file
 
 Supported Endpoints
