@@ -1,6 +1,7 @@
 
 import os
 import glob
+import time
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -13,6 +14,8 @@ base_dir = '/sys/bus/w1/devices/'
 # dtoverlay=w1-gpio,gpiopin=4
 ###########################################################
 
+MAX_RETRIES = 10
+
 class ds18b20_helper:
 
    device_file = None
@@ -21,6 +24,9 @@ class ds18b20_helper:
       pass
 
    class DeviceFormatException(Exception):
+      pass
+
+   class DeviceTimeoutException(Exception):
       pass
 
    ###############################################################
@@ -40,7 +46,9 @@ class ds18b20_helper:
          lines = f.readlines()
          f.close()
          return lines
-      except:
+      except Exception as e:
+         import traceback
+         traceback.print_exc()
          raise ds18b20_helper.DeviceException
  
    ###############################################################
@@ -52,9 +60,18 @@ class ds18b20_helper:
    def read_temp():
       try:
          lines = ds18b20_helper.read_temp_raw()
+  
+         retries = 0
+         #print("lines[0]:" + str(lines[0]))
          while lines[0].strip()[-3:] != 'YES':
             time.sleep(0.2)
-            lines = read_temp_raw()
+            retries += 1
+            #print("Retries:"+str(retries))
+            if retries > MAX_RETRIES:
+               raise ds18b20_helper.DeviceTimeoutException
+
+            lines = ds18b20_helper.read_temp_raw()
+
          equals_pos = lines[1].find('t=')
          if equals_pos != -1:
             temp_string = lines[1][equals_pos+2:]
@@ -62,6 +79,10 @@ class ds18b20_helper:
             temp_f = temp_c * 9.0 / 5.0 + 32.0
 
             return temp_c, temp_f
-      except:
+      except ds18b20_helper.DeviceTimeoutException:
+         raise
+      except Exception as e:
+         import traceback
+         traceback.print_exc()
          raise ds18b20_helper.DeviceFormatException
 

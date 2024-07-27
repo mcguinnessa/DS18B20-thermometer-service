@@ -22,6 +22,9 @@ def get_temperature(idx):
     except ds18b20_helper.DeviceFormatException as e:
        print("Exception:" + str(e))
        rc = {"error:": "Unexpected Format from device" }
+    except ds18b20_helper.DeviceTimeoutException as e:
+       print("Exception:" + str(e))
+       rc = {"error:": "Timed out reading from device" }
 
     print("T:" + str(rc))
     return jsonify(rc)
